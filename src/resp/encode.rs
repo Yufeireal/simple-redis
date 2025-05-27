@@ -3,7 +3,6 @@ use crate::{
     RespSet, SimpleError, SimpleString,
 };
 
-
 const BUF_CAP: usize = 4096;
 
 // - simple string: "+OK\r\n"

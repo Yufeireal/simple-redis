@@ -1,12 +1,14 @@
-
-use std::{collections::BTreeMap, ops::{Deref, DerefMut}};
+use std::{
+    collections::BTreeMap,
+    ops::{Deref, DerefMut},
+};
 
 use bytes::BytesMut;
 use enum_dispatch::enum_dispatch;
 use thiserror::Error;
 
-mod encode;
 mod decode;
+mod encode;
 
 #[enum_dispatch]
 pub trait RespEncode {
@@ -14,6 +16,7 @@ pub trait RespEncode {
 }
 
 pub trait RespDecode: Sized {
+    const PREFIX: &'static str;
     fn decode(buf: &mut BytesMut) -> Result<Self, RespError>;
     fn expect_length(buf: &[u8]) -> Result<usize, RespError>;
 }
@@ -47,7 +50,7 @@ pub enum RespFrame {
     Array(RespArray),
     NullArray(RespNullArray),
     Null(RespNull),
-    
+
     Boolean(bool),
     Double(f64),
     Map(RespMap),
@@ -78,7 +81,6 @@ pub struct RespMap(BTreeMap<String, RespFrame>);
 
 #[derive(Debug, PartialEq, PartialOrd)]
 pub struct RespSet(Vec<RespFrame>);
-
 
 impl Deref for SimpleString {
     type Target = String;
@@ -204,7 +206,7 @@ impl From<&[u8]> for RespFrame {
     }
 }
 
-impl <const N: usize> From<&[u8; N]> for BulkString {
+impl<const N: usize> From<&[u8; N]> for BulkString {
     fn from(s: &[u8; N]) -> Self {
         BulkString(s.to_vec())
     }
